@@ -3,23 +3,41 @@ version: '3.8'
 services:       # précise les différents services (images) à utiliser 
 
  nginx:
-  build: requirements/nginx/ 
-  env_file: .env          # indique le fichier optionnel contenant l'environnement
-  container_name: nginx # Le nom du container ( doit porter le meme nom que le service d'apres le sujet )
+  build: requirements/nginx/
+  env_file: .env              # indique le fichier optionnel contenant l'environnement
+  container_name: nginx       # Le nom du container ( doit porter le meme nom que le service d'apres le sujet )
+  volumes:
+   - wordpress:/var/www/html       # indique le volume à utiliser, détaillé juste en dessous
   ports:
-  - "443"             # le port, détaillé juste en dessous
-  restart: always         # Permet de redémarrer automatiquement le container en cas de crash
+  - 443:443                   # le port, détaillé juste en dessous
+  restart: always             # Permet de redémarrer automatiquement le container en cas de crash
+  networks:
+  - inception                 # indique le nom du réseau à utiliser
 
 # mariadb:
- # container_name: badgeuse
+ # container_name: mariadb
   #build: requirements/mariadb/
   #env_file: .env
   #restart: always
 
- #wordpress:
-  #build: requirements/wordpress/
-  #env_file: .env
-  #container_name: intra
-  #ports:
-  #- "80:80"
-  #restart: always 
+ wordpress:
+  build: requirements/wordpress/
+  env_file: .env
+  container_name: wordpress
+  volumes:
+   - wordpress:/var/www/html
+  ports:
+  - 9000:9000
+  networks:
+  - inception
+
+volumes:
+ wordpress:
+  driver: local
+  driver_opts:
+   type: none
+   o: bind
+   device: /home/bchabot/wordpress
+
+networks:
+ inception:
