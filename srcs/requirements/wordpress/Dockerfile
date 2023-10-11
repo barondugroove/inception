@@ -1,16 +1,22 @@
 FROM		alpine:3.17
 
-RUN			apk update && apk upgrade && apk add php php81 php-fpm php-mysqli
+RUN			apk update && apk upgrade && apk add php81 php-fpm php-mysqli
 
-RUN			rm -f /etc/wordpress/wordpress.conf
+WORKDIR		/var/www/html
 
-RUN			mkdir -p /var/www/html
-RUN			chmod -R 755 /var/www/html
-RUN			wget http://wordpress.org/latest.tar.gz -P /var/www/html
-RUN			tar -xzvf /var/www/html/latest.tar.gz -C /var/www/html && rm -rf /var/www/html/latest.tar.gz
+RUN			wget http://wordpress.org/latest.tar.gz
+RUN			tar -xzvf /var/www/html/latest.tar.gz && rm -rf latest.tar.gz
 
-RUN			chown -R root:root /var/www/html/wordpress
+RUN			cp wordpress/wp-config-sample.php wordpress/wp-config.php
 COPY		./setup_wordpress.sh run/setup_wordpress.sh
+
+
+RUN			adduser -S nginx && addgroup -S nginx
+RUN 		chown -R nginx:nginx ./wordpress/
+RUN			chmod -R 775 ./wordpress
+
+RUN			rm -f etc/php81/php-fpm.d/www.conf
+COPY		./www.conf /etc/php81/php-fpm.d/www.conf
 
 RUN			chmod -R +x run/setup_wordpress.sh
 

@@ -17,7 +17,7 @@ RUN			chown -R nginx:www-data /var/www/html
 
 RUN			echo "Vous etes bien arrive sur l'Internet" > /var/www/html/index.html
 
-EXPOSE		9000
+EXPOSE		443
 
 CMD			["nginx", "-g", "daemon off;"]
 #ENTRYPOINT	["sh", "run/setup_nginx.sh"]

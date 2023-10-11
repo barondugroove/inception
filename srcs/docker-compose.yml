@@ -7,7 +7,7 @@ services:       # précise les différents services (images) à utiliser
   env_file: .env              # indique le fichier optionnel contenant l'environnement
   container_name: nginx       # Le nom du container ( doit porter le meme nom que le service d'apres le sujet )
   volumes:
-   - wordpress:/var/www/html       # indique le volume à utiliser, détaillé juste en dessous
+   - wordpress:/var/www/html
   ports:
   - 443:443                   # le port, détaillé juste en dessous
   restart: always             # Permet de redémarrer automatiquement le container en cas de crash
@@ -37,7 +37,8 @@ volumes:
   driver_opts:
    type: none
    o: bind
-   device: /home/bchabot/wordpress
+   device: /home/bchabot/data/
 
 networks:
  inception:
+  driver: bridge
