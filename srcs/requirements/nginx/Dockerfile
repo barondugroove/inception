@@ -1,4 +1,4 @@
-FROM		alpine:3.17
+FROM		alpine:3.18
 
 RUN			apk update && apk upgrade && apk add openssl nginx
 
@@ -11,14 +11,13 @@ RUN			chmod -R +x run/setup_nginx.sh
 RUN			mkdir -p etc/nginx/ssl
 RUN			openssl req -x509 -nodes -out /etc/nginx/ssl/inception.crt -keyout /etc/nginx/ssl/inception.key -subj "/C=FR/ST=IDF/L=Angouleme/O=42/OU=42/CN=bchabot.42.fr/UID=bchabot"
 
+RUN			adduser -D -g 'www' www
+
 RUN			mkdir -p /var/www/html
 RUN			chmod 755 /var/www/html
-RUN			chown -R nginx:www-data /var/www/html
-
-RUN			echo "Vous etes bien arrive sur l'Internet" > /var/www/html/index.html
+RUN			chown -R www:www /var/lib/nginx
+RUN			chown -R www:www /var/www/
 
 EXPOSE		443
 
-CMD			["nginx", "-g", "daemon off;"]
-#ENTRYPOINT	["sh", "run/setup_nginx.sh"]
-
+ENTRYPOINT	["sh", "run/setup_nginx.sh"]

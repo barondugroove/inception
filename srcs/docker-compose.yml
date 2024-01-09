@@ -4,32 +4,48 @@ services:       # précise les différents services (images) à utiliser
 
  nginx:
   build: requirements/nginx/
-  env_file: .env              # indique le fichier optionnel contenant l'environnement
+  env_file: 
+    - .env              # indique le fichier optionnel contenant l'environnement
   container_name: nginx       # Le nom du container ( doit porter le meme nom que le service d'apres le sujet )
   volumes:
    - wordpress:/var/www/html
   ports:
-  - 443:443                   # le port, détaillé juste en dessous
+  - "443:443"                  # le port, détaillé juste en dessous
   restart: always             # Permet de redémarrer automatiquement le container en cas de crash
   networks:
   - inception                 # indique le nom du réseau à utiliser
+  depends_on:                 # indique les dépendances du service
+   - wordpress
 
-# mariadb:
- # container_name: mariadb
-  #build: requirements/mariadb/
-  #env_file: .env
-  #restart: always
+ mariadb:
+  container_name: mariadb
+  build: requirements/mariadb/
+  volumes:
+   - db:/var/lib/mysql
+  networks:
+   - inception
+  ports:
+   - "3306:3306"
+  restart: always
+  environment:
+   MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+   MYSQL_DATABASE: ${MYSQL_DATABASE}
+   MYSQL_USER: ${MYSQL_USER}
+   MYSQL_PASSWORD: ${MYSQL_PASSWORD}
 
  wordpress:
   build: requirements/wordpress/
-  env_file: .env
+  env_file:
+   - .env
   container_name: wordpress
   volumes:
    - wordpress:/var/www/html
   ports:
-  - 9000:9000
+  - "9000"
   networks:
   - inception
+  depends_on:
+   - mariadb
 
 volumes:
  wordpress:
@@ -38,6 +54,12 @@ volumes:
    type: none
    o: bind
    device: /home/bchabot/data/
+ db:
+  driver: local
+  driver_opts:
+   type: none
+   o: bind
+   device: bchabot/data/db
 
 networks:
  inception:
