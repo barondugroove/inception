@@ -1,7 +1,6 @@
 FROM		alpine:3.18
 
 RUN			apk update && apk upgrade && apk add --no-cache curl php-curl php-fpm php-mbstring php-mysqli php-phar php-zip mariadb-client
-RUN			rm -rf /var/cache/apk/*
 
 COPY		./setup_wordpress.sh run/setup_wordpress.sh
 RUN			chmod -R +x run/setup_wordpress.sh

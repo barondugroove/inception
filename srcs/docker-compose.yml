@@ -3,17 +3,17 @@ version: '3.8'
 services:       # précise les différents services (images) à utiliser 
 
  nginx:
+  container_name: nginx
   build: requirements/nginx/
   env_file: 
     - .env              # indique le fichier optionnel contenant l'environnement
-  container_name: nginx       # Le nom du container ( doit porter le meme nom que le service d'apres le sujet )
   volumes:
    - wordpress:/var/www/html
   ports:
-  - "443:443"                  # le port, détaillé juste en dessous
+   - "443:443"                  # le port, détaillé juste en dessous
   restart: always             # Permet de redémarrer automatiquement le container en cas de crash
   networks:
-  - inception                 # indique le nom du réseau à utiliser
+   - inception                 # indique le nom du réseau à utiliser
   depends_on:                 # indique les dépendances du service
    - wordpress
 
@@ -24,42 +24,45 @@ services:       # précise les différents services (images) à utiliser
    - db:/var/lib/mysql
   networks:
    - inception
-  ports:
-   - "3306:3306"
   restart: always
   environment:
    MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
    MYSQL_DATABASE: ${MYSQL_DATABASE}
    MYSQL_USER: ${MYSQL_USER}
    MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+  healthcheck: 
+   test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"] # indique la commande à utiliser pour vérifier la santé du service
+   interval: 1m # indique l'intervalle de temps entre chaque test
+   timeout: 10s # indique le temps d'attente avant de considérer le test comme un échec
+   retries: 3 # indique le nombre de fois que le test peut échouer avant de considérer le service comme non fonctionnel
 
  wordpress:
-  build: requirements/wordpress/
-  env_file:
-   - .env
   container_name: wordpress
+  build: requirements/wordpress/
   volumes:
    - wordpress:/var/www/html
-  ports:
-  - "9000"
+  env_file:
+   - .env
   networks:
-  - inception
+   - inception
   depends_on:
-   - mariadb
+   mariadb :
+    condition: service_healthy
 
 volumes:
- wordpress:
-  driver: local
-  driver_opts:
-   type: none
-   o: bind
-   device: /home/bchabot/data/
- db:
-  driver: local
-  driver_opts:
-   type: none
-   o: bind
-   device: bchabot/data/db
+  wordpress:
+   driver: local
+   driver_opts:
+    type: none
+    device: /home/bchabot/data/wordpress
+    o: bind
+ 
+  db:
+   driver: local
+   driver_opts:
+    type: none
+    device: /home/bchabot/data/db
+    o: bind
 
 networks:
  inception:

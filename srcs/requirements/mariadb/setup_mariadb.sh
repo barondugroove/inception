@@ -1,16 +1,17 @@
 # Start MariaDB
-mysql_install_db --user=mysql --datadir=/var/lib/mysql --skip-test-db
-mysqld --user=mysql --bootstrap <<EOF
-	USE mysql;
-	FLUSH PRIVILEGES ;
-	ALTER USER 'root'@'localhost' IDENTIFIED BY '$ROOT_PASSWORD';
-	CREATE DATABASE IF NOT EXISTS $DATABASE CHARACTER SET utf8 COLLATE utf8_general_ci;
-	GRANT ALL ON $DATABASE.* to '$USER'@'%' IDENTIFIED BY '$PASSWORD';
-	FLUSH PRIVILEGES ;
-EOF
+mysql_install_db --datadir=/var/lib/mysql --skip-test-db
 
-sed -i "s|.*bind-address\s*=.*|bind-address=0.0.0.0|g" /etc/my.cnf.d/mariadb-server.cnf
-sed -i "s|.*skip-networking.*|skip-networking=OFF\nskip-grant-tables=0|g" /etc/my.cnf.d/mariadb-server.cnf
+/etc/init.d/mariadb start
+#mysqld --defaults-file=/etc/mysql/mariadb.conf.d/50-server.cnf --user=root --datadir=/var/lib/mysql
+#PID=$!
+
+echo "FLUSH PRIVILEGES;" | mysql -uroot
+echo "GRANT ALL ON *.* to 'root'@'%' IDENTIFIED BY '$MYSQL_ROOT_PASSWORD'; FLUSH PRIVILEGES;" | mysql -uroot
+echo "CREATE USER IF NOT EXISTS '$MYSQL_USER'@'%' IDENTIFIED BY '$MYSQL_PASSWORD'; FLUSH PRIVILEGES;" | mysql -uroot
+echo "CREATE DATABASE IF NOT EXISTS $MYSQL_DATABASE; FLUSH PRIVILEGES;" | mysql -uroot
+echo "GRANT ALL ON $MYSQL_DATABASE.* to '$MYSQL_USER'@'%' IDENTIFIED BY '$MYSQL_PASSWORD'; FLUSH PRIVILEGES;" | mysql -uroot
+
+/etc/init.d/mariadb stop
 
 # Start MariaDB
-exec mysqld --user=mysql --console
+exec mysqld --user=$MYSQL_USER --console
