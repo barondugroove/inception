@@ -31,20 +31,28 @@ services:       # précise les différents services (images) à utiliser
    MYSQL_USER: ${MYSQL_USER}
    MYSQL_PASSWORD: ${MYSQL_PASSWORD}
   healthcheck: 
-   test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"] # indique la commande à utiliser pour vérifier la santé du service
-   interval: 1m # indique l'intervalle de temps entre chaque test
-   timeout: 10s # indique le temps d'attente avant de considérer le test comme un échec
-   retries: 3 # indique le nombre de fois que le test peut échouer avant de considérer le service comme non fonctionnel
+   test: ["CMD", "cat" ,"/tmp/ok"] # indique la commande à utiliser pour vérifier la santé du service
+   interval: 10s # indique l'intervalle de temps entre chaque test
 
  wordpress:
   container_name: wordpress
   build: requirements/wordpress/
   volumes:
    - wordpress:/var/www/html
-  env_file:
-   - .env
   networks:
    - inception
+  environment:
+   DOMAIN_NAME: ${DOMAIN_NAME}
+   WP_ADMIN_NAME: ${WP_ADMIN_NAME}
+   WP_ADMIN_PASSWORD: ${WP_ADMIN_PASSWORD}
+   WP_ADMIN_EMAIL: ${WP_ADMIN_EMAIL}
+   WP_GUEST_NAME: ${WP_GUEST_NAME}
+   WP_GUEST_PASSWORD: ${WP_GUEST_PASSWORD}
+   WP_GUEST_EMAIL: ${WP_GUEST_EMAIL}
+   MYSQL_USER: ${MYSQL_USER}
+   MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+   MYSQL_DATABASE: ${MYSQL_DATABASE}
+   DB_HOST: ${DB_HOST}
   depends_on:
    mariadb :
     condition: service_healthy

@@ -1,17 +1,36 @@
-# Start MariaDB
-mysql_install_db --datadir=/var/lib/mysql --skip-test-db
+#!/bin/sh
 
-/etc/init.d/mariadb start
-#mysqld --defaults-file=/etc/mysql/mariadb.conf.d/50-server.cnf --user=root --datadir=/var/lib/mysql
-#PID=$!
-
-echo "FLUSH PRIVILEGES;" | mysql -uroot
-echo "GRANT ALL ON *.* to 'root'@'%' IDENTIFIED BY '$MYSQL_ROOT_PASSWORD'; FLUSH PRIVILEGES;" | mysql -uroot
-echo "CREATE USER IF NOT EXISTS '$MYSQL_USER'@'%' IDENTIFIED BY '$MYSQL_PASSWORD'; FLUSH PRIVILEGES;" | mysql -uroot
-echo "CREATE DATABASE IF NOT EXISTS $MYSQL_DATABASE; FLUSH PRIVILEGES;" | mysql -uroot
-echo "GRANT ALL ON $MYSQL_DATABASE.* to '$MYSQL_USER'@'%' IDENTIFIED BY '$MYSQL_PASSWORD'; FLUSH PRIVILEGES;" | mysql -uroot
-
-/etc/init.d/mariadb stop
+echo "Starting MariaDB setup..."
 
 # Start MariaDB
-exec mysqld --user=$MYSQL_USER --console
+mkdir -p /etc/mysql/mariadb.conf.d
+cp /tmp/50-server.cnf /etc/mysql/mariadb.conf.d/50-server.cnf
+chmod 775 /etc/mysql/mariadb.conf.d/50-server.cnf
+chown -R mysql:mysql /etc/mysql/mariadb.conf.d/50-server.cnf
+
+mysql_install_db --datadir=/var/lib/mysql --skip-test-db > /dev/null
+
+echo "Starting MariaDB chown..."
+chown -R mysql:mysql /var/lib/mysql
+mkdir -p run/mysqld/ && chown -R mysql:mysql /run/mysqld/
+chmod -R 777 /run/mysqld/
+
+echo "abant lancement..."
+mysqld --defaults-file=/etc/mysql/mariadb.conf.d/50-server.cnf --user=mysql > output.log 2>&1 &
+PID="$!"
+
+sleep 1
+
+echo "Creating table..."
+mysql -e "CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\`;"
+mysql -e "CREATE USER IF NOT EXISTS \`${MYSQL_USER}\`@'localhost' IDENTIFIED BY '${MYSQL_PASSWORD}';"
+mysql -e "GRANT ALL PRIVILEGES ON \`${MYSQL_DATABASE}\`.* TO \`${MYSQL_USER}\`@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';"
+mysql -e "FLUSH PRIVILEGES;"
+
+kill -s TERM "${PID}"
+wait ${PID}
+
+echo lolololo > /tmp/ok
+
+# Start MariaDB
+exec mysqld --defaults-file=/etc/mysql/mariadb.conf.d/50-server.cnf --user=mysql
