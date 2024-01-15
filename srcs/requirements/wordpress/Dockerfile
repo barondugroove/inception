@@ -12,6 +12,4 @@ COPY 		./wp-config.php /tmp/wp-config.php
 
 RUN			mkdir -p /var/www/html/wordpress/
 
-EXPOSE		9000
-
 ENTRYPOINT	["sh", "run/setup_wordpress.sh"]

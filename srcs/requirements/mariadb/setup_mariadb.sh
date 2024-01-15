@@ -1,6 +1,8 @@
 #!/bin/sh
 echo "Starting MariaDB setup..."
 
+chown -R mysql:mysql /var/www/html/
+
 if [ -d "/run/mysqld" ]; then
 	echo "MariaDB is already installed."
 else
@@ -13,7 +15,6 @@ else
 
 	mysql_install_db --datadir=/var/lib/mysql --skip-test-db > /dev/null
 
-	echo "Starting MariaDB chown..."
 	chown -R mysql:mysql /var/lib/mysql
 	mkdir -p run/mysqld/ && chown -R mysql:mysql /run/mysqld/
 	chmod -R 777 /run/mysqld/

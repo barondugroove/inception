@@ -1,2 +1,2 @@
 echo "Nginx running..."
-nginx -g 'daemon off;'
+exec nginx -g 'daemon off;'

@@ -4,7 +4,7 @@ adduser -S www && addgroup -S www
 chown -R www:www /var/www/
 chmod -R 775 /var/www/
 
-if [ -f "/var/www/html/wordpress/wp-config.php)" ]; then
+if [ -f "/var/www/html/wordpress/wp-config.php" ]; then
     echo "WordPress is already installed. Skipping installation."
 else
 	cd /var/www/html/wordpress
