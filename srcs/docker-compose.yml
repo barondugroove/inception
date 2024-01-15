@@ -26,7 +26,6 @@ services:       # précise les différents services (images) à utiliser
    - inception
   restart: always
   environment:
-   MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
    MYSQL_DATABASE: ${MYSQL_DATABASE}
    MYSQL_USER: ${MYSQL_USER}
    MYSQL_PASSWORD: ${MYSQL_PASSWORD}
@@ -41,6 +40,7 @@ services:       # précise les différents services (images) à utiliser
    - wordpress:/var/www/html
   networks:
    - inception
+  restart: always
   environment:
    DOMAIN_NAME: ${DOMAIN_NAME}
    WP_ADMIN_NAME: ${WP_ADMIN_NAME}
@@ -52,7 +52,6 @@ services:       # précise les différents services (images) à utiliser
    MYSQL_USER: ${MYSQL_USER}
    MYSQL_PASSWORD: ${MYSQL_PASSWORD}
    MYSQL_DATABASE: ${MYSQL_DATABASE}
-   DB_HOST: ${DB_HOST}
   depends_on:
    mariadb :
     condition: service_healthy

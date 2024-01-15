@@ -1,8 +1,7 @@
 #!/bin/sh
 echo "Starting MariaDB setup..."
 
-if [ -d /var/lib/mysql/mysql ]
-then
+if [ -d "/run/mysqld" ]; then
 	echo "MariaDB is already installed."
 else
 	echo "Installing MariaDB..."
@@ -21,15 +20,14 @@ else
 
 fi
 
-if [ -d "/var/lib/mysql/${MYSQL_DATABASE}" ]
-then
+if [ -d "/var/lib/mysql/${MYSQL_DATABASE}" ]; then
 	echo "Database already exists."
 else
 	echo "Creating database..."
 	mysqld --defaults-file=/etc/mysql/mariadb.conf.d/50-server.cnf --user=mysql > output.log 2>&1 &
 	PID="$!"
 
-	sleep 1
+	sleep 0.5
 
 	mysql -e "CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\`;"
 	mysql -e "CREATE USER IF NOT EXISTS \`${MYSQL_USER}\`@'localhost' IDENTIFIED BY '${MYSQL_PASSWORD}';"
@@ -39,8 +37,9 @@ else
 	kill -s TERM "${PID}"
 	wait ${PID}
 
-	touch /tmp/ok
 fi
+
+touch /tmp/ok
 
 # Start MariaDB
 exec mysqld --defaults-file=/etc/mysql/mariadb.conf.d/50-server.cnf --user=mysql

@@ -1,6 +1,6 @@
 FROM		alpine:3.18
 
-RUN			apk update && apk upgrade && apk add openssl nginx
+RUN			apk add openssl nginx
 
 RUN			rm -f /etc/nginx/nginx.conf
 

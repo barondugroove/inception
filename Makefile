@@ -6,7 +6,7 @@
 #    By: bchabot <bchabot@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/07/25 20:18:45 by rlaforge          #+#    #+#              #
-#    Updated: 2024/01/14 22:11:15 by bchabot          ###   ########.fr        #
+#    Updated: 2024/01/15 00:49:02 by bchabot          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,19 +17,19 @@ create_local_volume:
 build: create_local_volume
 	@docker compose -f ./srcs/docker-compose.yml build --no-cache
 
-up: build
-	docker compose -f ./srcs/docker-compose.yml up -d
+up:
+	@docker compose -f ./srcs/docker-compose.yml up -d
 
 down:
 	@docker compose -f ./srcs/docker-compose.yml down --remove-orphans
 
 stop:
-	docker compose -f ./srcs/docker-compose.yml stop
+	@docker compose -f ./srcs/docker-compose.yml stop
 
 clean: down
 	@docker system prune -af --volumes
-	sudo rm -rvf ~/data/
+	@sudo rm -rf ~/data/
 
-.PHONY: up clean build stop down
+.PHONY: crezte_local_volume up clean build stop down
 
 
